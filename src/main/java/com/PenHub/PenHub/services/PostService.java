@@ -73,6 +73,9 @@ public class PostService {
     public List<Post> getPostByTitle(String title){
 //        return postRepository.findByTitle(title);
 
+        // this is used for customize query we have used sql Query
+       // return postRepository.findByTitleNative(title);
+
         // this is used for customize query we have used Jpql Query
         return postRepository.findByTitleContaining(title);
     }
