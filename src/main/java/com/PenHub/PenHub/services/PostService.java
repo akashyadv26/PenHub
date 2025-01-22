@@ -51,10 +51,7 @@ public class PostService {
 //             persistedTags.add(persistedTag);
 //         }
 
-        Set<Tag>persistedTags=post.getTags().stream().map(tag -> {
-            Tag persistedTag=tagRepository.findByName(tag.getName());
-            return persistedTag ==null ?tagRepository.save(tag):persistedTag;
-        }).collect(Collectors.toSet());
+        Set<Tag>persistedTags=post.getTags().stream().map(tag ->tagRepository.findByName(tag.getName()).orElseGet(()->tagRepository.save(tag))).collect(Collectors.toSet());
          post.setTags(persistedTags);
         return postRepository.save(post);
     }
@@ -87,10 +84,7 @@ public class PostService {
     public Post Update(int id,Post post){
         getpost(id);
         post.setId(id);
-        Set<Tag>persistedTags=post.getTags().stream().map(tag -> {
-            Tag persistedTag=tagRepository.findByName(tag.getName());
-            return persistedTag ==null ?tagRepository.save(tag):persistedTag;
-        }).collect(Collectors.toSet());
+        Set<Tag>persistedTags=post.getTags().stream().map(tag -> tagRepository.findByName(tag.getName()).orElseGet(()->tagRepository.save(tag))).collect(Collectors.toSet());
         post.setTags(persistedTags);
 
         return postRepository.save(post);
