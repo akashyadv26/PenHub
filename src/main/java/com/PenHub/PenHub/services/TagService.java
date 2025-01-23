@@ -50,8 +50,9 @@ public class TagService {
     }
 
     public void delete(String tagName){
-       Tag tag= tagRepository.findByName(tagName).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"tag with name :"+tagName+ "not found"));
-        if (!tagRepository.findByName(tagName).isEmpty()){
+       Tag tag= tagRepository.findByName(tagName).orElseThrow(()->
+               new ResponseStatusException(HttpStatus.NOT_FOUND,"tag with name :" +tagName+ "not found"));
+        if (!postRepository.findByTagsName(tagName).isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"you cannot delete tag name: "+tagName+ "because there are some posts who are using its refrences");
 
         }

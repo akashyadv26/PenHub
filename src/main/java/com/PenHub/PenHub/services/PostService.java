@@ -98,12 +98,17 @@ public class PostService {
 
     public Post ConvertToPost(PostRequestDto postRequestDto){
 
-        return new Post(0, postRequestDto.getTitle(), postRequestDto.getDescription(),
-                postRequestDto.getTags().stream().map(tag->new Tag(tag.toUpperCase())).collect(Collectors.toSet()));
+        Post post=new Post();
+        post.setTitle(postRequestDto.getTitle());
+        post.setDescription(postRequestDto.getDescription());
+        post.setTags(postRequestDto.getTags().stream().map(tag->new Tag(tag.toUpperCase())).collect(Collectors.toSet()));
+
+        return post;
     }
 
     public PostResponseDto ConvertToPostResponse(Post post){
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getDescription(),post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()));
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getDescription(),
+                post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()),post.getCreatedDate(), post.getLastModifiedDate());
     }
 
 

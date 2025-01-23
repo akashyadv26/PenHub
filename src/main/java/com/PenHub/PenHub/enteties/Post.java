@@ -1,11 +1,18 @@
 package com.PenHub.PenHub.enteties;
 
+import com.PenHub.PenHub.Configurations.AuditingConfiguration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,6 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity(name = "posts")
 @NamedEntityGraph(name = "post.tags",attributeNodes = @NamedAttributeNode("tags"))
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id
@@ -34,5 +42,12 @@ public class Post {
         )
 
         private Set<Tag> tags=new HashSet<>();
+
+        @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+        @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
 }
