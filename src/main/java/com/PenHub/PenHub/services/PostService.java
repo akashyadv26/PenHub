@@ -17,15 +17,6 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
 
-    //Added Student Record In LinkedHasMAp Because We are Not Using Database
-    //Has Map Store Value In key And Object Form
-
-
-//    LinkedHashMap<Integer, Post> posts=new LinkedHashMap<>(
-//            Map.of(1,new Post(1,"Java","Java Is Oops Based programming language"),
-//                    2,new Post(2,"Python","Python is high level language"))
-//    );
-
     @Autowired
    final private PostRepository postRepository;
 
@@ -40,26 +31,25 @@ public class PostService {
 
 
 
-
-    public Post createPost(Post post){
-//         Set<Tag>persistedTags=new HashSet<>();
-//         for (Tag tag: post.getTags()){
-//             Tag persistedTag=tagRepository.findByName(tag.getName());
-//             if(persistedTag == null){
-//                 persistedTag =tagRepository.save(tag);
-//             }
-//             persistedTags.add(persistedTag);
-//         }
-
-        Set<Tag>persistedTags=post.getTags().stream().map(tag ->tagRepository.findByName(tag.getName()).orElseGet(()->tagRepository.save(tag))).collect(Collectors.toSet());
-         post.setTags(persistedTags);
+    // Helper method to handle tags persistence logic
+    private Set<Tag> getPersistedTags(Set<Tag> tags) {
+        return tags.stream()
+                .map(tag -> tagRepository.findByName(tag.getName()).orElseGet(() -> tagRepository.save(tag)))
+                .collect(Collectors.toSet());
+    }
+    // Create a post, associating tags and saving them
+    public Post createPost(Post post) {
+        post.setTags(getPersistedTags(post.getTags()));
         return postRepository.save(post);
     }
 
+
+    // Retrieve all posts
     public List<Post> getAll(){
         return postRepository.findAll();
     }
 
+    // Get a single post by ID
     public Post getpost(int id){
 
         return postRepository.findById(id).orElseThrow(
@@ -67,35 +57,37 @@ public class PostService {
         );
     }
 
+    // Get posts by title (partial match)
     public List<Post> getPostByTitle(String title){
-       //        return postRepository.findByTitle(title);
-
         // this is used for customize query we have used sql Query
        // return postRepository.findByTitleNative(title);
-
         // this is used for customize query we have used Jpql Query
         return postRepository.findByTitleContaining(title);
     }
 
+
+    // Get posts by tag name
     public List<Post>getPostByTag(String tagname){
         return postRepository.findByTagsName(tagname);
     }
 
-    public Post Update(int id,Post post){
-        getpost(id);
+    // Update a post by ID
+    public Post update(int id, Post post) {
+        getpost(id); // Ensure post exists
         post.setId(id);
-        Set<Tag>persistedTags=post.getTags().stream().map(tag -> tagRepository.findByName(tag.getName()).orElseGet(()->tagRepository.save(tag))).collect(Collectors.toSet());
-        post.setTags(persistedTags);
-
+        post.setTags(getPersistedTags(post.getTags()));
         return postRepository.save(post);
     }
 
+
+    // Delete a post by ID
     public void  delete(int id) {
         Post post=postRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Post With "+id+ "Not Found"));
         post.setTags(new HashSet<>());
         postRepository.deleteById(id);
     }
 
+    // Convert PostRequestDto to Post entity
     public Post ConvertToPost(PostRequestDto postRequestDto){
 
         Post post=new Post();
@@ -106,6 +98,8 @@ public class PostService {
         return post;
     }
 
+
+    // Convert Post entity to PostResponseDto
     public PostResponseDto ConvertToPostResponse(Post post){
         return new PostResponseDto(post.getId(), post.getTitle(), post.getDescription(),
                 post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()),post.getCreatedDate(), post.getLastModifiedDate());

@@ -70,7 +70,7 @@ public class PostController {
     @PutMapping("/{id}")
     public  ResponseEntity<PostResponseDto> UpdatePostById(@PathVariable int id, @RequestBody PostRequestDto postRequestDto){
 
-        Post postResponse=postService.Update(id,postService.ConvertToPost(postRequestDto));
+        Post postResponse=postService.update(id,postService.ConvertToPost(postRequestDto));
         return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse),HttpStatus.CREATED);
     }
 
@@ -80,7 +80,7 @@ public class PostController {
         oldpost.setTitle(postRequestDto.getTitle() !=null ? postRequestDto.getTitle():oldpost.getTitle());
         oldpost.setDescription(postRequestDto.getDescription() !=null ? postRequestDto.getTitle() :oldpost.getDescription());
         oldpost.setTags(!postRequestDto.getTags().isEmpty()?postRequestDto.getTags().stream().map(name ->new Tag(name)).collect(Collectors.toSet()):oldpost.getTags());
-        Post postResponse=postService.Update(id,oldpost);
+        Post postResponse=postService.update(id,oldpost);
         return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse),HttpStatus.CREATED) ;
     }
 
