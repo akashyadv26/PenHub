@@ -1,0 +1,12 @@
+spring:
+  profiles:
+   active: dev
+
+  application:
+    name: PenHub
+
+
+
+server:
+  error:
+    include-message: always
