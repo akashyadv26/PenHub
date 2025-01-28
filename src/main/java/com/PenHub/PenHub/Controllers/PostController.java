@@ -7,6 +7,7 @@ import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.services.PostService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +41,29 @@ public class PostController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<PostResponseDto>> getAllPost(){
-        return new ResponseEntity<List<PostResponseDto>>(postService.getAll().stream().map(post -> postService.ConvertToPostResponse(post)).collect(Collectors.toList()),HttpStatus.OK);
+    public ResponseEntity<Page<PostResponseDto>> getAllPost(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
+            @RequestParam(defaultValue = "id") String sortBy
+
+    ){
+        Page<PostResponseDto>posts=postService.getAll(page,size,sortDirection,sortBy).map(post -> postService.ConvertToPostResponse(post));
+        return ResponseEntity.ok(posts);
     }
 
     @PostMapping("")
     public ResponseEntity<PostResponseDto> CreatePost(@RequestBody PostRequestDto postRequestDto){
         Post postResponse=postService.createPost(postService.ConvertToPost(postRequestDto));
         return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse), HttpStatus.CREATED);
+
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponseDto>> searchPosts(@RequestParam String value){
+        List<Post> searchResult=postService.search(value);
+        List<PostResponseDto> posts=searchResult.stream().map(postService::ConvertToPostResponse).toList();
+        return ResponseEntity.ok().body(posts);
 
     }
 

@@ -7,6 +7,10 @@ import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.repositories.PostRepository;
 import com.PenHub.PenHub.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,8 +49,13 @@ public class PostService {
 
 
     // Retrieve all posts
-    public List<Post> getAll(){
-        return postRepository.findAll();
+    public Page<Post> getAll(int page,int size,String sortDirection,String sortBy){
+        Pageable pageable= PageRequest.of(page,size, Sort.by(Sort.Direction.fromString(sortDirection),sortBy));
+        return postRepository.findAll(pageable);
+    }
+
+    public List<Post>search(String value){
+        return postRepository.searchPosts(value);
     }
 
     // Get a single post by ID

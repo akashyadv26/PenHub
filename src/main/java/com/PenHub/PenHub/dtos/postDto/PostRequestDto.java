@@ -14,6 +14,6 @@ import java.util.Set;
 public class PostRequestDto {
 
     private String title;
-    private String Description;
+    private String description;
     private Set<String> tags=new HashSet<>();
 }

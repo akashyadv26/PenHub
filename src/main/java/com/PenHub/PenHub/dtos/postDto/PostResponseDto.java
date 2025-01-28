@@ -15,7 +15,7 @@ public class PostResponseDto {
 
     private int id;
     private String title;
-    private String Description;
+    private String description;
     private Set<String> tags;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;

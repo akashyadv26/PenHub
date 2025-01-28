@@ -30,7 +30,7 @@ public class Post {
 
     private int id;
     private String title;
-    private String Description;
+    private String description;
 
 //    private LinkedHashSet<String> tags;
 
