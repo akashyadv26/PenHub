@@ -1,7 +1,7 @@
 package com.PenHub.PenHub.services;
 
-import com.PenHub.PenHub.dtos.postDto.PostRequestDto;
-import com.PenHub.PenHub.dtos.postDto.PostResponseDto;
+import com.PenHub.PenHub.dtos.PostDto.PostRequestDto;
+import com.PenHub.PenHub.dtos.PostDto.PostResponseDto;
 import com.PenHub.PenHub.enteties.Post;
 import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.repositories.PostRepository;

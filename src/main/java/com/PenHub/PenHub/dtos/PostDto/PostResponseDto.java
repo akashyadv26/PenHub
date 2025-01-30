@@ -1,9 +1,8 @@
-package com.PenHub.PenHub.dtos.postDto;
+package com.PenHub.PenHub.dtos.PostDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.Set;

@@ -1,6 +1,5 @@
-package com.PenHub.PenHub.dtos.postDto;
+package com.PenHub.PenHub.dtos.PostDto;
 
-import com.PenHub.PenHub.enteties.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

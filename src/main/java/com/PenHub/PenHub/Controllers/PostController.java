@@ -1,19 +1,16 @@
 package com.PenHub.PenHub.Controllers;
 
-import com.PenHub.PenHub.dtos.postDto.PostRequestDto;
-import com.PenHub.PenHub.dtos.postDto.PostResponseDto;
+import com.PenHub.PenHub.dtos.PostDto.PostRequestDto;
+import com.PenHub.PenHub.dtos.PostDto.PostResponseDto;
 import com.PenHub.PenHub.enteties.Post;
 import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.services.PostService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

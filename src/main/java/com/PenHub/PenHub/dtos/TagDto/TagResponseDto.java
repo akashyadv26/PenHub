@@ -1,4 +1,4 @@
-package com.PenHub.PenHub.dtos.postDto;
+package com.PenHub.PenHub.dtos.TagDto;
 
 
 import lombok.AllArgsConstructor;
