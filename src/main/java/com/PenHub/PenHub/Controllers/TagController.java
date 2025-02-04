@@ -18,7 +18,11 @@ import java.util.stream.Collectors;
 public class TagController {
 
     @Autowired
-    TagService tagService;
+    final private TagService tagService;
+
+    public TagController(TagService tagService) {
+        this.tagService = tagService;
+    }
 
 
     @GetMapping()

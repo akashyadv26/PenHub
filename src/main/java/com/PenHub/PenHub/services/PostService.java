@@ -4,6 +4,7 @@ import com.PenHub.PenHub.dtos.PostDto.PostRequestDto;
 import com.PenHub.PenHub.dtos.PostDto.PostResponseDto;
 import com.PenHub.PenHub.enteties.Post;
 import com.PenHub.PenHub.enteties.Tag;
+import com.PenHub.PenHub.enteties.User;
 import com.PenHub.PenHub.repositories.PostRepository;
 import com.PenHub.PenHub.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,17 @@ import java.util.stream.Collectors;
 public class PostService {
 
     @Autowired
-   final private PostRepository postRepository;
+    final private PostRepository postRepository;
+    final private TagRepository tagRepository;
+    final private UserService userService;
 
-     public PostService(PostRepository postRepository, TagRepository tagRepository){
+     public PostService(PostRepository postRepository, UserService userService, TagRepository tagRepository){
         this.postRepository = postRepository;
+         this.userService = userService;
          this.tagRepository = tagRepository;
      }
 
-    @Autowired
-   final private TagRepository tagRepository;
+
 
 
 
@@ -42,8 +45,10 @@ public class PostService {
                 .collect(Collectors.toSet());
     }
     // Create a post, associating tags and saving them
-    public Post createPost(Post post) {
+    public Post createPost(Post post,int userId) {
+        User user=userService.getById(userId);
         post.setTags(getPersistedTags(post.getTags()));
+        post.setUser(user);
         return postRepository.save(post);
     }
 
@@ -81,11 +86,21 @@ public class PostService {
     }
 
     // Update a post by ID
-    public Post update(int id, Post post) {
-        getpost(id); // Ensure post exists
-        post.setId(id);
-        post.setTags(getPersistedTags(post.getTags()));
-        return postRepository.save(post);
+    public Post update(int id, Post post,int userid) {
+        User user=userService.getById(userid);
+        Post existingpost=user.getPosts().stream().filter(dbuser->dbuser.getId()==id).findFirst().orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Post with id"+id+"not found"));
+
+        if(post.getTitle()!=null){
+            existingpost.setTitle(post.getTitle());
+        }
+        if (post.getDescription()!=null){
+            existingpost.setDescription(post.getDescription());
+        }
+        if (post.getTags()!=null){
+            existingpost.setTags(post.getTags());
+        }
+
+        return postRepository.save(existingpost);
     }
 
 

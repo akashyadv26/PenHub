@@ -17,10 +17,14 @@ import java.util.List;
 public class TagService {
 
     @Autowired
-    PostRepository postRepository;
+   final private PostRepository postRepository;
+   final private TagRepository tagRepository;
 
-    @Autowired
-    TagRepository tagRepository;
+
+    public TagService(PostRepository postRepository, TagRepository tagRepository) {
+        this.postRepository = postRepository;
+        this.tagRepository = tagRepository;
+    }
 
     public List<Tag>getAll(){
         return tagRepository.findAll();

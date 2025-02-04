@@ -36,11 +36,10 @@ public class PostController {
     }
 
 
-
     @GetMapping("")
     public ResponseEntity<Page<PostResponseDto>> getAllPost(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "1") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy
 
@@ -49,9 +48,9 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    @PostMapping("")
-    public ResponseEntity<PostResponseDto> CreatePost(@RequestBody PostRequestDto postRequestDto){
-        Post postResponse=postService.createPost(postService.ConvertToPost(postRequestDto));
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<PostResponseDto> CreatePost(@RequestBody PostRequestDto postRequestDto, @PathVariable int userId){
+        Post postResponse=postService.createPost(postService.ConvertToPost(postRequestDto),userId);
         return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse), HttpStatus.CREATED);
 
     }
@@ -80,21 +79,17 @@ public class PostController {
         return new ResponseEntity<List<PostResponseDto>>(postService.getPostByTag(value).stream().map(post -> postService.ConvertToPostResponse(post)).collect(Collectors.toList()),HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public  ResponseEntity<PostResponseDto> UpdatePostById(@PathVariable int id, @RequestBody PostRequestDto postRequestDto){
+    @PutMapping("/{id}/user/{userId}")
+    public  ResponseEntity<PostResponseDto> UpdatePostById(@PathVariable int id,@PathVariable int userId, @RequestBody PostRequestDto postRequestDto){
 
-        Post postResponse=postService.update(id,postService.ConvertToPost(postRequestDto));
-        return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse),HttpStatus.CREATED);
+        Post updatedPost=postService.update(id,postService.ConvertToPost(postRequestDto),userId);
+        return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(updatedPost),HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PostResponseDto> UpdatePartialPostById(@PathVariable int id,@RequestBody PostRequestDto postRequestDto ){
-        Post oldpost=postService.getpost(id);
-        oldpost.setTitle(postRequestDto.getTitle() !=null ? postRequestDto.getTitle():oldpost.getTitle());
-        oldpost.setDescription(postRequestDto.getDescription() !=null ? postRequestDto.getTitle() :oldpost.getDescription());
-        oldpost.setTags(!postRequestDto.getTags().isEmpty()?postRequestDto.getTags().stream().map(name ->new Tag(name)).collect(Collectors.toSet()):oldpost.getTags());
-        Post postResponse=postService.update(id,oldpost);
-        return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse),HttpStatus.CREATED) ;
+    @PatchMapping("/{id}/user/{userId}")
+    public ResponseEntity<PostResponseDto> UpdatePartialPostById(@PathVariable int id,@PathVariable int userId,@RequestBody PostRequestDto postRequestDto ){
+       Post updatedPost=postService.update(id,postService.ConvertToPost(postRequestDto),userId);
+        return ResponseEntity.ok(postService.ConvertToPostResponse(updatedPost));
     }
 
     @DeleteMapping("/{id}")

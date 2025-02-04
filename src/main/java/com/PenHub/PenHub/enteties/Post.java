@@ -50,4 +50,7 @@ public class Post {
         @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+        @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
