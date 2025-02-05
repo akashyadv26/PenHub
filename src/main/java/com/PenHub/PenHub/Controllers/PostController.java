@@ -39,7 +39,7 @@ public class PostController {
     @GetMapping("")
     public ResponseEntity<Page<PostResponseDto>> getAllPost(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "1") int size,
+            @RequestParam(defaultValue = "2") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy
 
@@ -92,9 +92,9 @@ public class PostController {
         return ResponseEntity.ok(postService.ConvertToPostResponse(updatedPost));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable int id){
-        postService.delete(id);
+    @DeleteMapping("/{id}/user/{userId}")
+    public ResponseEntity<?> deleteById(@PathVariable int id,@PathVariable int userId){
+        postService.delete(id,userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -1,5 +1,6 @@
 package com.PenHub.PenHub.dtos.PostDto;
 
+import com.PenHub.PenHub.dtos.UserDto.UserAutherResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class PostResponseDto {
     private Set<String> tags;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
+    private UserAutherResponseDto author;
 
 
 }

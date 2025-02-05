@@ -2,11 +2,13 @@ package com.PenHub.PenHub.services;
 
 import com.PenHub.PenHub.dtos.PostDto.PostRequestDto;
 import com.PenHub.PenHub.dtos.PostDto.PostResponseDto;
+import com.PenHub.PenHub.dtos.UserDto.UserAutherResponseDto;
 import com.PenHub.PenHub.enteties.Post;
 import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.enteties.User;
 import com.PenHub.PenHub.repositories.PostRepository;
 import com.PenHub.PenHub.repositories.TagRepository;
+import com.PenHub.PenHub.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,11 +28,13 @@ public class PostService {
     final private PostRepository postRepository;
     final private TagRepository tagRepository;
     final private UserService userService;
+    final private UserRepository userRepository;
 
-     public PostService(PostRepository postRepository, UserService userService, TagRepository tagRepository){
+     public PostService(PostRepository postRepository, UserService userService, TagRepository tagRepository, UserRepository userRepository){
         this.postRepository = postRepository;
          this.userService = userService;
          this.tagRepository = tagRepository;
+         this.userRepository = userRepository;
      }
 
 
@@ -105,10 +109,15 @@ public class PostService {
 
 
     // Delete a post by ID
-    public void  delete(int id) {
-        Post post=postRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Post With "+id+ "Not Found"));
-        post.setTags(new HashSet<>());
-        postRepository.deleteById(id);
+    public void  delete(int id,int userId) {
+         User user=userService.getById(userId);
+         Post existingPost=user.getPosts().stream().filter(post -> post.getId()==id).findFirst().orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Post With ID "+id+ "Not Found"));
+         user.getPosts().removeIf(post -> post.getId()==id);
+
+
+        existingPost.setTags(new HashSet<>());
+        postRepository.delete(existingPost);
+        userRepository.save(user);
     }
 
     // Convert PostRequestDto to Post entity
@@ -125,8 +134,23 @@ public class PostService {
 
     // Convert Post entity to PostResponseDto
     public PostResponseDto ConvertToPostResponse(Post post){
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getDescription(),
-                post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()),post.getCreatedDate(), post.getLastModifiedDate());
+
+        PostResponseDto postResponseDto=new PostResponseDto();
+        postResponseDto.setId(post.getId());
+        postResponseDto.setTitle(post.getTitle());
+        postResponseDto.setDescription(post.getDescription());
+        postResponseDto.setCreatedDate(post.getCreatedDate());
+        postResponseDto.setLastModifiedDate(post.getLastModifiedDate());
+        postResponseDto.setTags(post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()));
+        postResponseDto.setAuthor(convertTouserAutherResponseDto(post.getUser()));
+        return postResponseDto;
+    }
+
+    public UserAutherResponseDto convertTouserAutherResponseDto(User user){
+         UserAutherResponseDto userAutherResponseDto=new UserAutherResponseDto();
+         userAutherResponseDto.setId(user.getId());
+         userAutherResponseDto.setUsername(user.getUsername());
+         return userAutherResponseDto;
     }
 
 
