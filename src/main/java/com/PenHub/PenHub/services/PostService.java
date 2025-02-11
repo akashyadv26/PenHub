@@ -16,8 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,10 @@ public class PostService {
     final private TagRepository tagRepository;
     final private UserService userService;
     final private UserRepository userRepository;
+
+
+    @Autowired
+    ImageService imageService;
 
      public PostService(PostRepository postRepository, UserService userService, TagRepository tagRepository, UserRepository userRepository){
         this.postRepository = postRepository;
@@ -49,10 +56,15 @@ public class PostService {
                 .collect(Collectors.toSet());
     }
     // Create a post, associating tags and saving them
-    public Post createPost(Post post,int userId) {
+    public Post createPost(Post post, MultipartFile image, int userId) {
         User user=userService.getById(userId);
         post.setTags(getPersistedTags(post.getTags()));
         post.setUser(user);
+        try {
+            post.setImageUrl(imageService.saveImage(image));
+        } catch (IOException |NoSuchAlgorithmException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed To upload");
+        }
         return postRepository.save(post);
     }
 
@@ -143,6 +155,7 @@ public class PostService {
         postResponseDto.setLastModifiedDate(post.getLastModifiedDate());
         postResponseDto.setTags(post.getTags().stream().map(tag->tag.getName()).collect(Collectors.toSet()));
         postResponseDto.setAuthor(convertTouserAutherResponseDto(post.getUser()));
+        postResponseDto.setImageUrl(post.getImageUrl());
         return postResponseDto;
     }
 

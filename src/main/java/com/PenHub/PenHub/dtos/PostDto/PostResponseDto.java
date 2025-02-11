@@ -20,6 +20,5 @@ public class PostResponseDto {
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
     private UserAutherResponseDto author;
-
-
+    private String ImageUrl;
 }

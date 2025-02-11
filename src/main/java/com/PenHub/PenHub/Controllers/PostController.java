@@ -5,11 +5,18 @@ import com.PenHub.PenHub.dtos.PostDto.PostResponseDto;
 import com.PenHub.PenHub.enteties.Post;
 import com.PenHub.PenHub.enteties.Tag;
 import com.PenHub.PenHub.services.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,10 +36,12 @@ public class PostController {
 //    It is called Construction Injection
 
     @Autowired
-   final private PostService postService;
+    final private PostService postService;
+    final private ObjectMapper objectMapper;
 
-    PostController(PostService postService){
+    PostController(PostService postService, ObjectMapper objectMapper){
         this.postService=postService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -48,10 +57,17 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<PostResponseDto> CreatePost(@RequestBody PostRequestDto postRequestDto, @PathVariable int userId){
-        Post postResponse=postService.createPost(postService.ConvertToPost(postRequestDto),userId);
-        return new ResponseEntity<PostResponseDto>(postService.ConvertToPostResponse(postResponse), HttpStatus.CREATED);
+    @PostMapping(value = "/user/{userId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResponseDto> CreatePost(@RequestPart(name = "post",required = true) @Valid @NotNull String postRequestDtoString, @RequestPart(name = "image") MultipartFile image, @PathVariable int userId){
+       PostRequestDto postRequestDto=null;
+
+        try {
+            postRequestDto=objectMapper.readValue(postRequestDtoString,PostRequestDto.class);
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Invalid post data");
+        }
+        Post createdPost=postService.createPost(postService.ConvertToPost(postRequestDto),image,userId);
+        return ResponseEntity.status(201).body(postService.ConvertToPostResponse(createdPost));
 
     }
 
